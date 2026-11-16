@@ -8,7 +8,6 @@ function fmt(n, dec = 0) {
   if (n === null || n === undefined || n === "" || isNaN(n)) return "—";
   return Number(n).toLocaleString("es-ES", { maximumFractionDigits: dec, minimumFractionDigits: dec });
 }
-function ceilTo(n, step) { return Math.ceil(n / step) * step; }
 
 /* ---------- ITC-BT-10: coeficiente de simultaneidad ---------- */
 function simultaneidad(n, nocturna) {
@@ -180,17 +179,37 @@ function seccionCableCalc(d) {
   return { I, Sreq, elegida, dv, U, mono, gamma, L, cos };
 }
 
+/* ---------- UNE 20.460-5-523: sección por intensidad admisible ---------- */
+function admissibleSectionCalc(d) {
+  const I = Number(d.I) || 0;
+  if (I <= 0) return { error: "Introduce la intensidad de diseño I (A)." };
+  const mat = d.mat === "al" ? "al" : "cu";
+  const factor = mat === "al" ? 0.76 : 1;
+  const tabla = ADMISSIBLE_CU.map(([s, a]) => [s, a * factor]);
+  const chosen = tabla.find(([, a]) => a >= I);
+  if (!chosen) return { error: "Intensidad superior a la tabla (240 mm²). Revisa la instalación." };
+  return { I, mat, chosen };
+}
+
 /* ---------- ITC-BT-18: resistencia de toma de tierra ---------- */
 function resistenciaTierraCalc(d) {
   const rho = Number(d.rho) || 0;
   const L = Number(d.L) || 0;
-  const dmm = Number(d.d) || 0;
+  const P = Number(d.perimetro) || 0;
   if (rho <= 0) return { error: "Introduce la resistividad del terreno ρ (Ω·m)." };
-  if (L <= 0) return { error: "Introduce la longitud del electrodo L (m)." };
-  if (dmm <= 0) return { error: "Introduce el diámetro del electrodo d (mm)." };
-  const dm = dmm / 1000;
-  const R = (rho / (2 * Math.PI * L)) * (Math.log(4 * L / dm) - 1);
+  const tipo = d.tipo || "vertical";
+  let R;
+  if (tipo === "vertical") {
+    if (L <= 0) return { error: "Introduce la longitud del electrodo L (m)." };
+    R = rho / L;
+  } else if (tipo === "horizontal") {
+    if (L <= 0) return { error: "Introduce la longitud del conductor L (m)." };
+    R = (2 * rho) / L;
+  } else {
+    if (P <= 0) return { error: "Introduce el perímetro P (m) de la placa o malla." };
+    R = (0.8 * rho) / P;
+  }
   const Ia = d.Ia !== "" && d.Ia !== null && d.Ia !== undefined ? Number(d.Ia) : null;
   const Rmax = Ia ? 50 / Ia : null;
-  return { rho, L, dmm, R, Ia, Rmax, cumple: Rmax !== null ? R <= Rmax : null };
+  return { rho, L, perimetro: P, R, Ia, Rmax, cumple: Rmax !== null ? R <= Rmax : null, tipo };
 }

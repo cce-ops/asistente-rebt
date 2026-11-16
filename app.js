@@ -281,12 +281,13 @@ $("#btnCalcCable").addEventListener("click", () => {
 
 /* ---------- Resistencia de toma de tierra (BT-18) ---------- */
 $("#btnResetTierra").addEventListener("click", () => {
-  $("#tRho").value = ""; $("#tL").value = ""; $("#tD").value = ""; $("#tIa").value = ""; $("#tOut").value = "";
+  $("#tTipo").value = "vertical";
+  $("#tRho").value = ""; $("#tL").value = ""; $("#tP").value = ""; $("#tIa").value = ""; $("#tOut").value = "";
   $("#resTierra").style.display = "none";
 });
 
 $("#btnCalcTierra").addEventListener("click", () => {
-  const d = { rho: $("#tRho").value, L: $("#tL").value, d: $("#tD").value, Ia: $("#tIa").value };
+  const d = { rho: $("#tRho").value, L: $("#tL").value, d: 0, Ia: $("#tIa").value, tipo: $("#tTipo").value, perimetro: $("#tP").value };
   const r = resistenciaTierraCalc(d);
   if (r.error) {
     $("#tOut").value = r.error;
@@ -297,20 +298,36 @@ $("#btnCalcTierra").addEventListener("click", () => {
   $("#tOut").value = `R ≈ ${r.R.toFixed(2)} Ω`;
   let html = `<span class="badge ${r.cumple === null ? "bajo" : (r.cumple ? "bajo" : "alto")}">R ≈ ${r.R.toFixed(2)} Ω</span>`;
   html += kv([
+    ["Tipo de electrodo", r.tipo === "vertical" ? "Pica vertical (R = ρ/L)" : r.tipo === "horizontal" ? "Conductor horizontal (R = 2ρ/L)" : r.tipo === "placa" ? "Placa enterrada (R = 0,8ρ/P)" : "Malla (R = 0,8ρ/P)"],
     ["Resistividad ρ", `${fmt(r.rho)} Ω·m`],
-    ["Longitud electrodo L", `${fmt(r.L)} m`],
-    ["Diámetro d", `${fmt(r.dmm)} mm`],
+    ["Longitud L", r.L ? `${fmt(r.L)} m` : "—"],
+    ["Perímetro P", r.perimetro ? `${fmt(r.perimetro)} m` : "—"],
     ["R máxima para TT (50 V / Ia)", r.Rmax !== null ? `${r.Rmax.toFixed(2)} Ω` : "No calculada (introduce Ia)"]
   ]);
   if (r.Rmax !== null) {
     html += r.cumple
       ? `<p class="hint">Cumple: R ≤ Rmax. Para Ia = ${fmt(r.Ia)} A, el límite de RA es 50/Ia = ${r.Rmax.toFixed(2)} Ω.</p>`
-      : `<p class="aviso">No cumple: R > Rmax. Aumenta L (más profundo o más electrodos en paralelo), mejora el terreno (sales, bentonita) o reduce Ia con diferencial de menor sensibilidad.</p>`;
+      : `<p class="aviso">No cumple: R > Rmax. Aumenta L o P (más electrodos en paralelo), mejora el terreno (sales, bentonita) o reduce Ia con diferencial de menor sensibilidad.</p>`;
   } else {
-    html += `<p class="hint">Fórmula orientativa para electrodo vertical. Para TT la condición es RA × Ia ≤ 50 V (24 V en local conductor); introduce Ia para comprobar.</p>`;
+    html += `<p class="hint">Fórmulas orientativas de BT-18 tabla 5. Para TT la condición es RA × Ia ≤ 50 V (24 V en local conductor); introduce Ia para comprobar. Medir R in situ.</p>`;
   }
   $("#resTierra").style.display = "block";
   $("#resTierra").innerHTML = html;
 });
+  /* ---------- Sección por intensidad admisible (UNE 20.460-5-523) ---------- */
+  $("#tbAdm").innerHTML = ADMISSIBLE_CU.map(([s, a]) => `<tr><td>${s}</td><td>${a}</td></tr>`).join("");
+
+  $("#btnCalcAdm").addEventListener("click", () => {
+    const r = admissibleSectionCalc({ I: $("#aI").value, mat: $("#aMat").value });
+    if (r.error) { $("#aOut").value = r.error; return; }
+    const cu = r.chosen[1];
+    const al = (r.chosen[1] * 0.76).toFixed(1);
+    $("#aOut").value = `${r.chosen[0]} mm² (admisible ${r.mat === "al" ? al : cu} A)`;
+  });
+
+  /* =========================================================================
+     Normativa
+     ========================================================================= */
+  $("#listaNormas").innerHTML =
   NORMAS.map((n) => `<li><a href="${n.u}" target="_blank" rel="noopener">${n.t}</a></li>`).join("") +
   `<li><strong>Normas UNE citadas:</strong><ul>${NORMAS_UNE.map((u) => `<li>${u}</li>`).join("")}</ul></li>`;

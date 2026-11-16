@@ -230,9 +230,30 @@
       <p class="hint">Fórmula orientativa para electrodo vertical (barra): R = ρ/(2π·L)·(ln(4L/d) − 1). Para TT se cumple RA × Ia ≤ 50 V (o 24 V en local conductor).</p>
       <div class="row">
         <label class="fld">
+          <span>Tipo de electrodo</span>
+          <select id="tTipo">
+            <option value="vertical">Pica vertical (R = ρ/L)</option>
+            <option value="horizontal">Conductor horizontal (R = 2ρ/L)</option>
+            <option value="placa">Placa enterrada (R = 0,8ρ/P)</option>
+            <option value="malla">Malla (asimilable a placa, R = 0,8ρ/P)</option>
+          </select>
+        </label>
+        <label class="fld">
           <span>Resistividad del terreno ρ (Ω·m)</span>
           <input id="tRho" type="number" min="0" step="1" placeholder="Ej. 100">
         </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Longitud L (m) (pica / conductor)</span>
+          <input id="tL" type="number" min="0" step="0,1" placeholder="Ej. 3">
+        </label>
+        <label class="fld">
+          <span>Perímetro P (m) (placa / malla)</span>
+          <input id="tP" type="number" min="0" step="0,1" placeholder="Ej. 4">
+        </label>
+      </div>
+      <div class="row">
         <label class="fld">
           <span>Terreno de referencia (rellena ρ)</span>
           <select id="tTerreno">
@@ -247,30 +268,49 @@
             <option value="275">Arena arcillosa (50-500)</option>
           </select>
         </label>
-      </div>
-      <div class="row">
-        <label class="fld">
-          <span>Longitud del electrodo L (m)</span>
-          <input id="tL" type="number" min="0" step="0,1" placeholder="Ej. 3">
-        </label>
-        <label class="fld">
-          <span>Diámetro del electrodo d (mm)</span>
-          <input id="tD" type="number" min="0" step="1" placeholder="Ej. 16">
-        </label>
-      </div>
-      <div class="row">
         <label class="fld">
           <span>Intensidad Ia (A) para límite TT (opcional)</span>
           <input id="tIa" type="number" min="0" step="0,1" placeholder="Ej. 100">
-        </label>
-        <label class="fld">
-          <span>Resultado</span>
-          <input id="tOut" readonly tabindex="-1">
         </label>
       </div>
       <button type="button" class="btn primary" id="btnCalcTierra">Calcular R</button>
       <button type="button" class="btn" id="btnResetTierra">Limpiar</button>
     </form>
+  </div>
+
+  <div class="card">
+    <h2>Sección por intensidad admisible (UNE 20.460-5-523)</h2>
+    <p class="hint">Dada la intensidad de diseño, devuelve la sección normalizada mínima cuya intensidad admisible la cubre (valores orientativos, Cu, PVC 70 °C, circuito único, 30 °C ambiente).</p>
+    <div class="row">
+      <label class="fld">
+        <span>Intensidad de diseño I (A)</span>
+        <input id="aI" type="number" min="0" step="0,1" placeholder="Ej. 25">
+      </label>
+      <label class="fld">
+        <span>Material</span>
+        <select id="aMat">
+          <option value="cu">Cobre</option>
+          <option value="al">Aluminio (×0,76)</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label class="fld">
+        <span>Resultado</span>
+        <input id="aOut" readonly tabindex="-1">
+      </label>
+      <label class="fld">
+        <span></span>
+        <button type="button" class="btn primary" id="btnCalcAdm">Calcular sección</button>
+      </label>
+    </div>
+    <div class="tabla-wrap">
+      <table class="tabla">
+        <caption>UNE 20.460-5-523 · Intensidades admisibles orientativas (Cu, PVC 70 °C)</caption>
+        <thead><tr><th>Sección (mm²)</th><th>Intensidad admisible (A)</th></tr></thead>
+        <tbody id="tbAdm"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card">

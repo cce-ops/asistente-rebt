@@ -190,6 +190,45 @@ const BT28_ALIMENTACION = [
   ["Con corte largo", "Disponible en más de 15 s"]
 ];
 
+/* ---------- BT-18: resistividad del terreno (tabla 3) ---------- */
+const BT18_RESISTIVIDAD = [
+  ["Terrenos pantanosos", "de algunas unidades a 30"],
+  ["Limo", "20 a 100"],
+  ["Humus", "10 a 150"],
+  ["Turba húmeda", "5 a 100"],
+  ["Arcilla plástica", "50"],
+  ["Margas y arcillas compactas", "100 a 200"],
+  ["Margas del Jurásico", "30 a 40"],
+  ["Arena arcillosa", "50 a 500"],
+  ["Arena silícea", "200 a 3.000"],
+  ["Suelo pedregoso cubierto de césped", "300 a 500"],
+  ["Suelo pedregoso desnudo", "1.500 a 3.000"],
+  ["Calizas blandas", "100 a 300"],
+  ["Calizas compactas", "1.000 a 5.000"],
+  ["Calizas agrietadas", "500 a 1.000"],
+  ["Pizarras", "50 a 300"],
+  ["Roca de mica y cuarzo", "800"],
+  ["Granitos y gres procedente de alteración", "1.500 a 10.000"],
+  ["Granito y gres muy alterado", "100 a 600"]
+];
+const BT18_RESISTIVIDAD_MEDIA = [
+  ["Terrenos cultivables y fértiles, terraplenes compactos y húmedos", "50"],
+  ["Terraplenes cultivables poco fértiles y otros terraplenes", "500"],
+  ["Suelos pedregosos desnudos, arenas secas permeables", "3.000"]
+];
+const BT18_TABLA5 = [
+  ["Placa enterrada", "R = 0,8 · ρ / P", "P = perímetro de la placa (m)"],
+  ["Pica vertical", "R = ρ / L", "L = longitud de la pica (m)"],
+  ["Conductor enterrado horizontalmente", "R = 2 · ρ / L", "L = longitud del conductor (m)"],
+  ["Malla (asimilable a placa)", "R = 0,8 · ρ / P", "P = perímetro de la malla (m)"]
+];
+
+/* ---------- UNE 20.460-5-523: intensidades admisibles orientativas (Cu, PVC 70 °C, circuito único, 30 °C ambiente) ---------- */
+const ADMISSIBLE_CU = [
+  [1.5, 13.5], [2.5, 18], [4, 24], [6, 31], [10, 42], [16, 56], [25, 73], [35, 89],
+  [50, 110], [70, 139], [95, 170], [120, 200], [150, 230], [185, 266], [240, 318]
+];
+
 /* ---------- Catálogo para el explorador de tablas ---------- */
 const TABLAS = [
   { id: "art4", norma: "REBT · Art. 4", titulo: "Clasificación de tensiones",
@@ -330,7 +369,18 @@ const TABLAS = [
     ],
     notas: ["Prioridad 1a/1b/1c: módulos de reserva de la centralización existente, luego ampliación, luego centralización nueva.",
       "Esquema 2: justificar que el fusible de la centralización protege en cortocircuito a la DI y al circuito de recarga; el control de potencia lo hace el contador principal (sin ICP externo).",
-      "Preinstalación: conducciones por vías principales y centralización con módulos de reserva para al menos el 20 % de plazas no asociadas a vivienda y, en todo caso, un módulo mínimo."] }
+      "Preinstalación: conducciones por vías principales y centralización con módulos de reserva para al menos el 20 % de plazas no asociadas a vivienda y, en todo caso, un módulo mínimo."] },
+  { id: "bt18-resist", norma: "ITC-BT-18 · Tabla 3 y 5", titulo: "Resistividad del terreno y fórmulas de resistencia de tierra",
+    cab: ["Terreno", "Resistividad (Ω·m)"],
+    filas: BT18_RESISTIVIDAD,
+    notas: ["Tabla 4 — valores medios: terrenos cultivables y fértiles, terraplenes compactos y húmedos: 50 Ω·m; terraplenes cultivables poco fértiles y otros terraplenes: 500 Ω·m; suelos pedregosos desnudos, arenas secas permeables: 3.000 Ω·m.",
+      "Tabla 5 — fórmulas orientativas: placa enterrada R = 0,8·ρ/P; pica vertical R = ρ/L; conductor enterrado horizontalmente R = 2·ρ/L; malla asimilable a placa R = 0,8·ρ/P.",
+      "Para TT la condición es RA × Ia ≤ 50 V (24 V en local conductor). Medir R in situ; las fórmulas son orientativas."] },
+  { id: "une523", norma: "UNE 20.460-5-523", titulo: "Intensidades admisibles orientativas (Cu, PVC 70 °C, circuito único, 30 °C ambiente)",
+    cab: ["Sección (mm²)", "Intensidad admisible (A)"],
+    filas: ADMISSIBLE_CU.map(([s, a]) => [String(s), String(a)]),
+    notas: ["Valores orientativos. Para aluminio, multiplicar aproximadamente por 0,76 para la misma sección.",
+      "La intensidad admisible real depende del método de instalación, agrupamiento, temperatura ambiente y del tipo de aislamiento (UNE 20.460-5-523 y anexo nacional)."] }
 ];
 
 /* ---------- Documentación mínima ---------- */
