@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asistente REBT · RD 842/2002 e ITC-BT</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>Asistente REBT</h1>
+      <p class="tag">RD 842/2002 · ITC-BT-01 a BT-52 · Previsión de cargas, cuadro, protecciones y documentación</p>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs wrap" role="tablist">
+  <button class="tab active" data-tab="cargas" role="tab">Cargas y cuadro</button>
+  <button class="tab" data-tab="protecciones" role="tab">Protecciones y tierra</button>
+  <button class="tab" data-tab="clasificador" role="tab">Documental e inspecciones</button>
+  <button class="tab" data-tab="banera" role="tab">Bañera y ducha</button>
+  <button class="tab" data-tab="ve" role="tab">Recarga VE</button>
+  <button class="tab" data-tab="tablas" role="tab">Tablas</button>
+  <button class="tab" data-tab="docs" role="tab">Documentación</button>
+  <button class="tab" data-tab="normas" role="tab">Normativa</button>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ CARGAS Y CUADRO ============ -->
+<section id="cargas" class="panel active">
+  <div class="grid2">
+    <form id="formCargas" class="card" autocomplete="off">
+      <h2>Previsión de cargas (ITC-BT-10) y cuadro general (BT-17 / BT-25)</h2>
+      <p class="hint">Edificio destinado preferentemente a viviendas, con locales y garaje. Rellena lo que aplique.</p>
+
+      <h3>Viviendas</h3>
+      <div class="row">
+        <label class="fld">
+          <span>Número de viviendas (n)</span>
+          <input id="nViv" type="number" min="1" step="1" value="10">
+        </label>
+        <label class="fld">
+          <span>Potencia prevista por vivienda (W)</span>
+          <input id="potViv" type="number" min="0" step="10" value="5750">
+        </label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="electAlta"> Electrificación elevada (potencia ≥ 9 200 W: superficie &gt; 160 m², calefacción/AA, recarga VE unifamiliar…)</label>
+        <label><input type="checkbox" id="tarifaNoct"> Tarifa nocturna (factor de simultaneidad = n)</label>
+      </div>
+
+      <h3>Resto del edificio</h3>
+      <div class="row">
+        <label class="fld">
+          <span>Servicios generales del edificio (W)</span>
+          <input id="servGen" type="number" min="0" step="10" placeholder="Ej. 8000">
+        </label>
+        <label class="fld">
+          <span>Locales comerciales / oficinas (m² por planta)</span>
+          <input id="locCom" type="number" min="0" step="1" placeholder="Ej. 120">
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Garaje (m² por planta)</span>
+          <input id="garaje" type="number" min="0" step="1" placeholder="Ej. 300">
+        </label>
+        <label class="fld">
+          <span>Tipo de garaje</span>
+          <select id="garTipo">
+            <option value="natural">Ventilación natural (10 W/m²)</option>
+            <option value="forzada">Ventilación forzada (20 W/m²)</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Plazas de estacionamiento construidas (para recarga VE)</span>
+          <input id="plazasVE" type="number" min="0" step="1" placeholder="Ej. 40">
+        </label>
+        <label class="fld">
+          <span>Potencia por estación de recarga (W)</span>
+          <input id="potVE" type="number" min="0" step="10" value="3680">
+        </label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="conSPL"> Con Sistema de Protección de la Línea general (SPL) — factor de simultaneidad VE = 0,3</label>
+      </div>
+
+      <h3>Cuadro general</h3>
+      <div class="row">
+        <label class="fld">
+          <span>Suministro</span>
+          <select id="suministro">
+            <option value="mono">Monofásico 230 V</option>
+            <option value="tri">Trifásico 230/400 V</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Esquema de conexión (BT-08)</span>
+          <select id="esquema">
+            <option value="TN-S">TN-S</option>
+            <option value="TN-C-S">TN-C-S</option>
+            <option value="TT">TT</option>
+            <option value="IT">IT</option>
+          </select>
+        </label>
+      </div>
+      <label class="fld">
+        <span>Número de circuitos interiores previstos (BT-25)</span>
+        <input id="nCircuitos" type="number" min="1" step="1" value="8">
+      </label>
+
+      <button type="button" class="btn primary" id="btnCalcCargas">Calcular carga y cuadro</button>
+      <button type="button" class="btn" id="btnResetCargas">Limpiar</button>
+    </form>
+
+    <div class="card result" id="resCargas">
+      <p class="hint">Rellena los datos y pulsa <strong>Calcular carga y cuadro</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROTECCIONES Y TIERRA ============ -->
+<section id="protecciones" class="panel">
+  <div class="grid2">
+    <form id="formProt" class="card" autocomplete="off">
+      <h2>Protección contra contactos indirectos (ITC-BT-24)</h2>
+      <p class="hint">Comprobación del corte automático: Zs·Ia ≤ U0 (TN/IT) o RA·Ia ≤ U (TT).</p>
+
+      <div class="row">
+        <label class="fld">
+          <span>Esquema de conexión</span>
+          <select id="pEsquema">
+            <option value="TN">TN</option>
+            <option value="TT">TT</option>
+            <option value="IT">IT</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Tensión nominal U0 (V)</span>
+          <input id="pU0" type="number" min="0" step="1" value="230">
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span id="pZsLabel">Impedancia de bucle de defecto Zs (Ω)</span>
+          <input id="pZs" type="number" min="0" step="0.001" placeholder="Ej. 0,35">
+        </label>
+        <label class="fld">
+          <span>Corriente que asegura el corte Ia (A)</span>
+          <input id="pIa" type="number" min="0" step="0,1" placeholder="Ej. 160">
+        </label>
+      </div>
+      <label class="fld hidden" id="pNeutro">
+        <span>Neutro distribuido (solo esquema IT)</span>
+        <select>
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </label>
+      <button type="button" class="btn primary" id="btnCalcProt">Comprobar corte</button>
+      <button type="button" class="btn" id="btnResetProt">Limpiar</button>
+    </form>
+
+    <div class="card result" id="resProt">
+      <p class="hint">Introduce Zs (o RA en TT) e Ia y pulsa <strong>Comprobar corte</strong>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Referencias rápidas de protección y puesta a tierra</h2>
+    <div class="tabla-wrap">
+      <table class="tabla">
+        <caption>ITC-BT-24 · Tiempos máximos de interrupción por corte automático (tabla 1)</caption>
+        <thead><tr><th>U0 (V)</th><th>Tiempo de interrupción (s)</th></tr></thead>
+        <tbody>
+          <tr><td>230</td><td>0,4</td></tr>
+          <tr><td>400</td><td>0,2</td></tr>
+          <tr><td>&gt; 400</td><td>0,1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li><strong>TN:</strong> Zs × Ia ≤ U0. En TN-C no se usarán diferenciales; en TN-C-S no se usa CPN aguas abajo del diferencial.</li>
+      <li><strong>TT:</strong> RA × Ia ≤ U (50 V; 24 V en local conductor). Dispositivos: diferencial-residual, o máxima corriente si RA es muy baja.</li>
+      <li><strong>IT:</strong> 2 × Zs × Ia ≤ U (neutro no distribuido) ó 2 × Zs′ × Ia ≤ U0 (neutro distribuido); tiempo máx. 5 s en casos especiales.</li>
+      <li><strong>Protección complementaria:</strong> diferencial-residual ≤ 30 mA (clase A si se prevén corrientes diferenciales no senoidales).</li>
+      <li><strong>Tensiones de contacto límite (BT-18):</strong> 24 V en local o emplazamiento conductor; 50 V en los demás casos.</li>
+    </ul>
+    <div class="tabla-wrap">
+      <table class="tabla">
+        <caption>ITC-BT-18 · Sección mínima del conductor de protección (tabla 2)</caption>
+        <thead><tr><th>Sección de fase S (mm²)</th><th>Sección mínima de protección Sp (mm²)</th></tr></thead>
+        <tbody>
+          <tr><td>S ≤ 16</td><td>Sp = S</td></tr>
+          <tr><td>16 &lt; S ≤ 35</td><td>Sp = 16</td></tr>
+          <tr><td>S &gt; 35</td><td>Sp = S/2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul>
+      <li>Conductores de protección no integrados en canalización: cobre ≥ 2,5 mm² con protección mecánica; ≥ 4 mm² sin ella.</li>
+      <li>Conductor de equipotencialidad principal: ≥ mitad del conductor de protección de mayor sección, mínimo 6 mm² (2,5 mm² si es cobre).</li>
+      <li>Conductores de tierra enterrados (tabla 1 BT-18): protegidos contra corrosión → 16 mm² cobre o 16 mm² acero galvanizado; sin protección contra corrosión → 25 mm² cobre o 50 mm² hierro.</li>
+      <li>Profundidad de enterramiento nunca inferior a 0,50 m. Sección del neutro ≥ sección de fases (armónicos), salvo justificación (BT-19).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ CLASIFICADOR DOCUMENTAL ============ -->
+<section id="clasificador" class="panel">
+  <div class="grid2">
+    <form id="formDoc" class="card" autocomplete="off">
+      <h2>¿Proyecto o memoria técnica de diseño? (ITC-BT-04)</h2>
+      <label class="fld">
+        <span>Tipo de instalación (grupos BT-04.3.1)</span>
+        <select id="docGrupo">
+          <option value="">— Selecciona —</option>
+          <option value="a">a) Industrias, en general</option>
+          <option value="b">b) Locales húmedos, polvorientos o con riesgo de corrosión; bombas de extracción o elevación de agua</option>
+          <option value="c">c) Locales mojados; generadores y convertidores; conductores aislados para caldeo (excepto viviendas)</option>
+          <option value="d">d) Temporal para maquinaria de obras; temporal en locales o emplazamientos abiertos</option>
+          <option value="e">e) Edificios destinados principalmente a viviendas, locales comerciales y oficinas (no pública concurrencia)</option>
+          <option value="f">f) Viviendas unifamiliares</option>
+          <option value="g">g) Aparcamientos con ventilación forzada</option>
+          <option value="h">h) Aparcamientos con ventilación natural</option>
+          <option value="i">i) Locales de pública concurrencia</option>
+          <option value="j">j) Líneas BT con apoyos comunes con AT; máquinas de elevación y transporte; tensiones especiales; rótulos luminosos; cercas eléctricas; redes aéreas o subterráneas de distribución</option>
+          <option value="k">k) Alumbrado exterior</option>
+          <option value="l">l) Locales con riesgo de incendio o explosión (excepto aparcamientos)</option>
+          <option value="m">m) Quirófanos y salas de intervención</option>
+          <option value="n">n) Piscinas y fuentes</option>
+          <option value="z">z) Infraestructuras para recarga de vehículo eléctrico</option>
+        </select>
+      </label>
+      <label class="fld">
+        <span>Potencia prevista P (W) — según ITC-BT-10</span>
+        <input id="docPot" type="number" min="0" step="10" placeholder="Ej. 12000">
+      </label>
+      <div class="checks">
+        <label><input type="checkbox" id="docModo4"> Incluye estaciones de recarga en modo de carga 4 (proyecto en cualquier caso)</label>
+        <label><input type="checkbox" id="docRecargExterior"> Instalación de recarga situada en el exterior (grupo z: proyecto si P &gt; 10 kW)</label>
+      </div>
+      <button type="button" class="btn primary" id="btnCalcDoc">Determinar documentación</button>
+      <button type="button" class="btn" id="btnResetDoc">Limpiar</button>
+    </form>
+
+    <div class="card result" id="resDoc">
+      <p class="hint">Selecciona tipo de instalación y potencia, y pulsa <strong>Determinar documentación</strong>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Inspecciones (ITC-BT-05)</h2>
+    <ul>
+      <li><strong>Inspección inicial</strong> (antes de la puesta en servicio, por Organismo de Control): instalaciones industriales con proyecto y P &gt; 100 kW; locales de pública concurrencia; locales de riesgo de incendio/explosión clase I (excepto aparcamientos &lt; 25 plazas); locales mojados con P &gt; 25 kW; piscinas con P &gt; 10 kW; quirófanos y salas de intervención; alumbrado exterior con P &gt; 5 kW; estaciones de recarga que requieran proyecto.</li>
+      <li><strong>Inspecciones periódicas:</strong> cada <strong>5 años</strong> las que precisaron inspección inicial; cada <strong>10 años</strong> las comunes de edificios de viviendas con potencia total instalada &gt; 100 kW.</li>
+      <li><strong>Calificación:</strong> favorable / condicionada (plazo de corrección ≤ 6 meses) / negativa (defecto muy grave → no entra en servicio o se remite a la CCAA).</li>
+      <li><strong>Verificaciones previas</strong> a la puesta en servicio por la empresa instaladora, según UNE 20.460-6-61.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ BAÑERA Y DUCHA ============ -->
+<section id="banera" class="panel">
+  <div class="card">
+    <h2>Locales con bañera o ducha (ITC-BT-27)</h2>
+    <p class="hint">Volúmenes 0, 1, 2 y 3 y grados de protección mínimos. La protección contra contactos directos e indirectos puede ser MBTS según UNE 20.460-4-41.</p>
+    <div class="tabla-wrap">
+      <table class="tabla">
+        <caption>Tabla 1 BT-27 · Elección e instalación de los materiales eléctricos</caption>
+        <thead><tr><th>Volumen</th><th>Grado de protección del cableado</th><th>Mecanismos</th><th>Otros aparatos fijos</th></tr></thead>
+        <tbody id="tbVolumenes"></tbody>
+      </table>
+    </div>
+    <ul>
+      <li><strong>Volumen 0:</strong> interior de la bañera o bajo el plato de ducha. Cableado IPX7; aparatos solo los previstos para ese volumen.</li>
+      <li><strong>Volumen 1:</strong> desde el nivel más alto del volumen 0 hasta 2,25 m del suelo. Cableado IPX4 (IPX2 por encima del nivel más alto de un difusor fijo; IPX5 en bañeras de hidromasaje y baños comunes con chorros).</li>
+      <li><strong>Volumen 2:</strong> 0,60 m alrededor del volumen 1. Cableado IPX4 con las mismas salvedades.</li>
+      <li><strong>Volumen 3:</strong> desde el plano superior del volumen 2 hasta 2,25 m del suelo; hasta 3 m si el techo es más bajo. Cableado IPX5 en baños comunes con chorros.</li>
+      <li>Bañeras y duchas metálicas: aislamiento ≥ 100 kΩ frente a la estructura (UNE 20.460-6-61, anexo A) o conexión equipotencial suplementaria.</li>
+      <li>Equipotencialidad suplementaria: masas, canalizaciones metálicas de agua/gas/calefacción, partes metálicas accesibles de la estructura, en volúmenes 0 a 3.</li>
+      <li>Bañeras de hidromasaje y cabinas de ducha con circuitos eléctricos: UNE-EN 60.335-2-60; cable H05VV-F; IPX5 en cajas de conexión; sin empalmes salvo cajas IPX5.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ RECARGA VE ============ -->
+<section id="ve" class="panel">
+  <div class="grid2">
+    <form id="formVE" class="card" autocomplete="off">
+      <h2>Infraestructura de recarga (ITC-BT-52)</h2>
+      <label class="fld">
+        <span>Caso</span>
+        <select id="veCaso">
+          <option value="uni">Vivienda unifamiliar — circuito C13 (tabla 1)</option>
+          <option value="cole">Aparcamiento colectivo — circuito de recarga colectivo trifásico (tabla 2)</option>
+        </select>
+      </label>
+      <div class="row" id="veBloqueUni">
+        <label class="fld">
+          <span>Interruptor automático de protección (A)</span>
+          <select id="veInUni">
+            <option value="10">10 A (230 V)</option>
+            <option value="16" selected>16 A (230 V)</option>
+            <option value="20">20 A (230 V)</option>
+            <option value="32">32 A (230 V)</option>
+            <option value="40">40 A (230 V)</option>
+            <option value="16t">16 A (230/400 V)</option>
+            <option value="20t">20 A (230/400 V)</option>
+            <option value="32t">32 A (230/400 V)</option>
+            <option value="40t">40 A (230/400 V)</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Resultado</span>
+          <input id="veOutUni" readonly tabindex="-1">
+        </label>
+      </div>
+      <div class="row hidden" id="veBloqueCole">
+        <label class="fld">
+          <span>Interruptor automático de protección (A)</span>
+          <select id="veInCole">
+            <option value="16" selected>16 A (230/400 V)</option>
+            <option value="32">32 A (230/400 V)</option>
+            <option value="50">50 A (230/400 V)</option>
+            <option value="63">63 A (230/400 V)</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Resultado</span>
+          <input id="veOutCole" readonly tabindex="-1">
+        </label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="veSpl"> Con SPL (factor de simultaneidad VE = 0,3). Sin SPL: factor = 1,0</label>
+      </div>
+      <button type="button" class="btn primary" id="btnCalcVE">Consultar escalón</button>
+      <button type="button" class="btn" id="btnResetVE">Limpiar</button>
+    </form>
+
+    <div class="card result" id="resVE">
+      <p class="hint">Elige caso e interruptor y pulsa <strong>Consultar escalón</strong>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Prescripciones generales BT-52</h2>
+    <ul>
+      <li>Esquemas de instalación: 1a/1b/1c (colectivo con contador principal), 2 (individual, contador común), 3a/3b (individual, contador por estación), 4a/4b (circuito adicional). Prioridad: módulos de reserva de la centralización (1a, 3a) antes de ampliar o crear centralización nueva.</li>
+      <li>Previsión de cargas BT-10.5.2: 3 680 W × 10 % de las plazas construidas; simultaneidad 0,3 con SPL, 1,0 sin SPL.</li>
+      <li>Caída de tensión máxima hasta el punto de recarga: 5 %. Sección mínima 2,5 mm² cobre (4 mm² aluminio fuera de viviendas y aparcamientos colectivos en edificios de viviendas).</li>
+      <li>Esquema TN: solo variante TN-S. Protección diferencial de clase A. Cada punto de conexión, protegido individualmente.</li>
+      <li>Circuito de recarga: dedicado, sin otros usos salvo consumos auxiliares de la propia estación. Iluminación: ≥ 20 lux exterior, ≥ 50 lux interior en zona de maniobra.</li>
+      <li>Modos de carga 1 a 4; SAVE = sistema de alimentación específico de vehículo eléctrico.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ TABLAS ============ -->
+<section id="tablas" class="panel">
+  <div class="card">
+    <h2>Explorador de tablas e ITC</h2>
+    <input id="filtroTabla" class="search" type="search" placeholder="Buscar ITC, tabla o concepto (ej. simultaneidad, C13, IPX7, 30 mA)…">
+    <div id="listaIcs" class="tablas"></div>
+    <div id="listaTablas" class="tablas"></div>
+  </div>
+</section>
+
+<!-- ============ DOCUMENTACIÓN ============ -->
+<section id="docs" class="panel">
+  <div class="card">
+    <h2>Documentación mínima</h2>
+    <p class="hint">Marca lo que ya tienes. Se genera una lista imprimible para la tramitación ante la CCAA.</p>
+    <div class="toolbar">
+      <button class="btn" id="btnImprimir">Imprimir</button>
+      <button class="btn" id="btnResetChecks">Desmarcar todo</button>
+    </div>
+    <div id="checklist" class="checklist"></div>
+  </div>
+</section>
+
+<!-- ============ NORMATIVA ============ -->
+<section id="normas" class="panel">
+  <div class="card">
+    <h2>Normativa de referencia</h2>
+    <ul class="enlaces" id="listaNormas"></ul>
+    <p class="aviso">
+      Herramienta de apoyo técnico y didáctico. No sustituye al proyecto o memoria firmados por técnico competente,
+      ni a la interpretación de la Administración competente ni de la empresa distribuidora. Verifica siempre el texto consolidado vigente.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="wrap pie">
+  <p>Asistente REBT · datos extraídos de BOE-A-2002-18099 (RD 842/2002) texto consolidado, última actualización 03/09/2025, e ITC-BT-52 (RD 1053/2014).</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
