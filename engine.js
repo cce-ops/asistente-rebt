@@ -51,7 +51,6 @@ function cargasCalc(d) {
   ];
   out.total = total;
 
-  /* Intensidad y cuadro */
   const mono = d.suministro === "mono";
   const U = mono ? 230 : 400;
   const I = mono ? total / 230 : total / (SQRT3 * 400);
@@ -126,7 +125,7 @@ function docCalc(d) {
   const grupo = g[0];
 
   if (["g", "h", "i", "j", "l", "m"].includes(grupo)) {
-    necesita = true; /* cualquier potencia / ocupación */
+    necesita = true;
   } else if (grupo === "z") {
     if (d.modo4) { necesita = true; limiteTxt = "Sin límite: incluye estaciones en modo de carga 4"; }
     else if (d.exterior && P > 10000) { necesita = true; limiteTxt = "En exterior: P > 10 kW"; }
@@ -154,4 +153,44 @@ function veCalc(d) {
       : ["Estaciones monofásicas repartidas equilibradamente entre las tres fases.",
          "Número máximo calculado para estaciones de 3.680 W unitarias; justificable otro número con distinta potencia unitaria."]
   };
+}
+
+/* ---------- ITC-BT-19: sección de conductor por caída de tensión ---------- */
+const SECCIONES_NORMALIZADAS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
+
+function seccionCableCalc(d) {
+  const Iin = d.I !== "" && d.I !== null && d.I !== undefined ? Number(d.I) : null;
+  const P = d.P !== "" && d.P !== null && d.P !== undefined ? Number(d.P) : null;
+  if (Iin === null && P === null) return { error: "Introduce la intensidad I o la potencia P." };
+  const L = Number(d.L) || 0;
+  if (L <= 0) return { error: "Introduce la longitud del circuito (m)." };
+  const dv = Number(d.dv) || 0;
+  if (dv <= 0) return { error: "Introduce la caída de tensión máxima (%)." };
+  const mono = d.sum === "mono";
+  const U = mono ? 230 : 400;
+  const cos = Number(d.cos) || 1;
+  let I = Iin;
+  if (I === null) {
+    I = mono ? P / (U * cos) : P / (SQRT3 * U * cos);
+  }
+  const gamma = d.mat === "al" ? 34 : 56;
+  const factor = mono ? 2 : SQRT3;
+  const Sreq = (factor * I * L) / (gamma * U * (dv / 100));
+  const elegida = SECCIONES_NORMALIZADAS.find((s) => s >= Sreq) || null;
+  return { I, Sreq, elegida, dv, U, mono, gamma, L, cos };
+}
+
+/* ---------- ITC-BT-18: resistencia de toma de tierra ---------- */
+function resistenciaTierraCalc(d) {
+  const rho = Number(d.rho) || 0;
+  const L = Number(d.L) || 0;
+  const dmm = Number(d.d) || 0;
+  if (rho <= 0) return { error: "Introduce la resistividad del terreno ρ (Ω·m)." };
+  if (L <= 0) return { error: "Introduce la longitud del electrodo L (m)." };
+  if (dmm <= 0) return { error: "Introduce el diámetro del electrodo d (mm)." };
+  const dm = dmm / 1000;
+  const R = (rho / (2 * Math.PI * L)) * (Math.log(4 * L / dm) - 1);
+  const Ia = d.Ia !== "" && d.Ia !== null && d.Ia !== undefined ? Number(d.Ia) : null;
+  const Rmax = Ia ? 50 / Ia : null;
+  return { rho, L, dmm, R, Ia, Rmax, cumple: Rmax !== null ? R <= Rmax : null };
 }

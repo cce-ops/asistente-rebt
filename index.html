@@ -171,6 +171,108 @@
     </div>
   </div>
 
+  <div class="grid2">
+    <form id="formCable" class="card" autocomplete="off">
+      <h2>Sección de conductor por caída de tensión (BT-19.2.2.2 / BT-25)</h2>
+      <p class="hint">Cálculo orientativo por resistencia (CC). La sección final debe comprobarse con intensidades admisibles UNE 20.460-5-523 y condiciones de instalación.</p>
+      <div class="row">
+        <label class="fld">
+          <span>Intensidad de funcionamiento I (A)</span>
+          <input id="cI" type="number" min="0" step="0,1" placeholder="Si vacío, se calcula desde P">
+        </label>
+        <label class="fld">
+          <span>Potencia P (W) (opcional)</span>
+          <input id="cP" type="number" min="0" step="10" placeholder="Ej. 3450">
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Factor de potencia cos φ</span>
+          <input id="cCos" type="number" min="0,1" max="1" step="0,01" value="1">
+        </label>
+        <label class="fld">
+          <span>Suministro</span>
+          <select id="cSum">
+            <option value="mono">Monofásico 230 V</option>
+            <option value="tri">Trifásico 230/400 V</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Longitud del circuito (m, ida)</span>
+          <input id="cL" type="number" min="0" step="0,5" placeholder="Ej. 25">
+        </label>
+        <label class="fld">
+          <span>Caída de tensión máxima (%)</span>
+          <input id="cDv" type="number" min="0,1" max="10" step="0,1" value="3">
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Material del conductor</span>
+          <select id="cMat">
+            <option value="cu">Cobre (γ = 56 m/(Ω·mm²))</option>
+            <option value="al">Aluminio (γ = 34 m/(Ω·mm²))</option>
+          </select>
+        </label>
+        <label class="fld">
+          <span>Resultado</span>
+          <input id="cOut" readonly tabindex="-1">
+        </label>
+      </div>
+      <button type="button" class="btn primary" id="btnCalcCable">Calcular sección</button>
+      <button type="button" class="btn" id="btnResetCable">Limpiar</button>
+    </form>
+
+    <form id="formTierra" class="card" autocomplete="off">
+      <h2>Resistencia de toma de tierra (ITC-BT-18)</h2>
+      <p class="hint">Fórmula orientativa para electrodo vertical (barra): R = ρ/(2π·L)·(ln(4L/d) − 1). Para TT se cumple RA × Ia ≤ 50 V (o 24 V en local conductor).</p>
+      <div class="row">
+        <label class="fld">
+          <span>Resistividad del terreno ρ (Ω·m)</span>
+          <input id="tRho" type="number" min="0" step="1" placeholder="Ej. 100">
+        </label>
+        <label class="fld">
+          <span>Terreno de referencia (rellena ρ)</span>
+          <select id="tTerreno">
+            <option value="">— selecciona —</option>
+            <option value="17">Terrenos pantanosos (5-30)</option>
+            <option value="60">Limo (20-100)</option>
+            <option value="80">Humus (10-150)</option>
+            <option value="50">Turba húmeda (5-100)</option>
+            <option value="50b">Arcilla plástica (≈50)</option>
+            <option value="150">Margas y arcillas compactas (100-200)</option>
+            <option value="35">Margas del Jurásico (30-40)</option>
+            <option value="275">Arena arcillosa (50-500)</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Longitud del electrodo L (m)</span>
+          <input id="tL" type="number" min="0" step="0,1" placeholder="Ej. 3">
+        </label>
+        <label class="fld">
+          <span>Diámetro del electrodo d (mm)</span>
+          <input id="tD" type="number" min="0" step="1" placeholder="Ej. 16">
+        </label>
+      </div>
+      <div class="row">
+        <label class="fld">
+          <span>Intensidad Ia (A) para límite TT (opcional)</span>
+          <input id="tIa" type="number" min="0" step="0,1" placeholder="Ej. 100">
+        </label>
+        <label class="fld">
+          <span>Resultado</span>
+          <input id="tOut" readonly tabindex="-1">
+        </label>
+      </div>
+      <button type="button" class="btn primary" id="btnCalcTierra">Calcular R</button>
+      <button type="button" class="btn" id="btnResetTierra">Limpiar</button>
+    </form>
+  </div>
+
   <div class="card">
     <h2>Referencias rápidas de protección y puesta a tierra</h2>
     <div class="tabla-wrap">

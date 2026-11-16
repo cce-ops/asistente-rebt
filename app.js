@@ -234,8 +234,83 @@ $("#btnImprimir").addEventListener("click", () => window.print());
 renderChecklist();
 
 /* =========================================================================
-   Normativa
+   Sección de conductor por caída de tensión (BT-19)
    ========================================================================= */
-$("#listaNormas").innerHTML =
+$("#tTerreno").addEventListener("change", () => {
+  const v = $("#tTerreno").value;
+  if (v) $("#tRho").value = v.replace(/\D/g, "");
+});
+
+$("#btnResetCable").addEventListener("click", () => {
+  $("#cI").value = ""; $("#cP").value = ""; $("#cL").value = ""; $("#cOut").value = "";
+  $("#resCable").style.display = "none";
+});
+
+$("#btnCalcCable").addEventListener("click", () => {
+  const d = {
+    I: $("#cI").value,
+    P: $("#cP").value,
+    cos: $("#cCos").value,
+    sum: $("#cSum").value,
+    L: $("#cL").value,
+    dv: $("#cDv").value,
+    mat: $("#cMat").value
+  };
+  const r = seccionCableCalc(d);
+  if (r.error) {
+    $("#cOut").value = r.error;
+    $("#resCable").style.display = "block";
+    $("#resCable").innerHTML = `<p class="aviso">${r.error}</p>`;
+    return;
+  }
+  const chosen = r.elegida !== null ? `${r.elegida} mm²` : "superior a 240 mm²";
+  $("#cOut").value = `S req. ${r.Sreq.toFixed(2)} mm² → ${chosen}`;
+  let html = `<span class="badge bajo">Sección requerida: ${r.Sreq.toFixed(2)} mm² → normalizada ${chosen}</span>`;
+  html += kv([
+    ["Intensidad de funcionamiento", `${fmt(r.I, 2)} A`],
+    ["Tensión nominal", `${r.U} V (${r.mono ? "monofásico" : "trifásico"})`],
+    ["Longitud", `${fmt(r.L)} m`],
+    ["Caída de tensión máxima", `${r.dv} %`],
+    ["Material / γ", `${r.mat === "al" ? "Aluminio" : "Cobre"} / ${r.gamma} m/(Ω·mm²)`],
+    ["Factor de longitud", r.mono ? "2 (ida y vuelta)" : "√3 (trifásico)"]
+  ]);
+  html += `<p class="hint">Comprueba la sección elegida con la intensidad admisible del conductor (UNE 20.460-5-523) para el método de instalación, temperatura y agrupamiento. Si la sección requerida supera 240 mm², revisa la longitud o la caída admitida.</p>`;
+  $("#resCable").style.display = "block";
+  $("#resCable").innerHTML = html;
+});
+
+/* ---------- Resistencia de toma de tierra (BT-18) ---------- */
+$("#btnResetTierra").addEventListener("click", () => {
+  $("#tRho").value = ""; $("#tL").value = ""; $("#tD").value = ""; $("#tIa").value = ""; $("#tOut").value = "";
+  $("#resTierra").style.display = "none";
+});
+
+$("#btnCalcTierra").addEventListener("click", () => {
+  const d = { rho: $("#tRho").value, L: $("#tL").value, d: $("#tD").value, Ia: $("#tIa").value };
+  const r = resistenciaTierraCalc(d);
+  if (r.error) {
+    $("#tOut").value = r.error;
+    $("#resTierra").style.display = "block";
+    $("#resTierra").innerHTML = `<p class="aviso">${r.error}</p>`;
+    return;
+  }
+  $("#tOut").value = `R ≈ ${r.R.toFixed(2)} Ω`;
+  let html = `<span class="badge ${r.cumple === null ? "bajo" : (r.cumple ? "bajo" : "alto")}">R ≈ ${r.R.toFixed(2)} Ω</span>`;
+  html += kv([
+    ["Resistividad ρ", `${fmt(r.rho)} Ω·m`],
+    ["Longitud electrodo L", `${fmt(r.L)} m`],
+    ["Diámetro d", `${fmt(r.dmm)} mm`],
+    ["R máxima para TT (50 V / Ia)", r.Rmax !== null ? `${r.Rmax.toFixed(2)} Ω` : "No calculada (introduce Ia)"]
+  ]);
+  if (r.Rmax !== null) {
+    html += r.cumple
+      ? `<p class="hint">Cumple: R ≤ Rmax. Para Ia = ${fmt(r.Ia)} A, el límite de RA es 50/Ia = ${r.Rmax.toFixed(2)} Ω.</p>`
+      : `<p class="aviso">No cumple: R > Rmax. Aumenta L (más profundo o más electrodos en paralelo), mejora el terreno (sales, bentonita) o reduce Ia con diferencial de menor sensibilidad.</p>`;
+  } else {
+    html += `<p class="hint">Fórmula orientativa para electrodo vertical. Para TT la condición es RA × Ia ≤ 50 V (24 V en local conductor); introduce Ia para comprobar.</p>`;
+  }
+  $("#resTierra").style.display = "block";
+  $("#resTierra").innerHTML = html;
+});
   NORMAS.map((n) => `<li><a href="${n.u}" target="_blank" rel="noopener">${n.t}</a></li>`).join("") +
   `<li><strong>Normas UNE citadas:</strong><ul>${NORMAS_UNE.map((u) => `<li>${u}</li>`).join("")}</ul></li>`;
