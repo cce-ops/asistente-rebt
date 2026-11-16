@@ -19,6 +19,7 @@ Herramienta web estática (HTML/CSS/JS, sin dependencias ni build) para el Regla
   - Comprobación del corte automático: Zs × Ia ≤ U0 (TN), RA × Ia ≤ U (TT), 2 × Zs × Ia ≤ U (IT).
   - Tiempos máximos de interrupción (0,4 / 0,2 / 0,1 s), tensión límite 50 V (24 V en local conductor).
   - Secciones mínimas de conductores de tierra y de protección, equipotencialidad, resistencia de toma.
+  - Calculadora de sección de conductor por caída de tensión (BT-19.2.2.2 / BT-25) y de resistencia de toma de tierra (BT-18).
 - **Documental e inspecciones** (ITC-BT-04, BT-05):
   - Proyecto o memoria técnica de diseño según grupo y potencia (tabla BT-04.3.1).
   - Inspección inicial por OC, periódicas cada 5 años (y 10 años en comunes de viviendas > 100 kW), calificación y defectos.
